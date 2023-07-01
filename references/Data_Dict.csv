@@ -1,0 +1,14 @@
+﻿Column,Description,API Expected Parameter
+brewery_id,Identifier of brewery,No
+brewery_name,Name of brewery,Yes
+review_time,Timestamp of review,No
+review_overall,Overall score given by reviewer,No
+review_aroma,Score given by reviewer regarding beer aroma,Yes
+review_appearance,Score given by reviewer regarding beer appearance,Yes
+review_profilename,Profile name of reviewer,No
+review_palate,Score given by reviewer regarding beer palate,Yes
+review_taste,Score given by reviewer regarding beer taste,Yes
+beer_style (target),Type of beer,No
+beer_name,Name of beer,No
+beer_abv,Alcohol by volume measure,Yes
+beer_beerid,Identifier of beer,No
