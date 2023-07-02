@@ -175,3 +175,36 @@ def save_sets(X_train=None, y_train=None, X_val=None, y_val=None, X_test=None, y
       np.save(f'{path}y_val',   y_val)
     if y_test is not None:
       np.save(f'{path}y_test',  y_test)
+
+# Missingnes
+import pandas as pd
+
+class MissingIncidentsChecker:
+    def __init__(self, frame):
+        self.frame = frame
+
+    def check_missing_incidents(self):
+        for variable in self.frame.columns:
+            missing_incidents = self.frame[self.frame[variable].isnull() | self.frame[variable].eq(0) | self.frame[variable].isin(['N/A', 'nill', 'null'])][variable]
+            if not missing_incidents.empty:
+                print(f"Missing incidents for variable '{variable}':")
+                for incident in missing_incidents:
+                    print(incident)
+                print() 
+
+                import pandas as pd
+
+# Count missingnes
+import pandas as pd
+import numpy as np
+
+class MissingIncidentsCounter:
+    def __init__(self, frame):
+        self.frame = frame
+
+    def count_missing_incidents(self):
+        missing_counts = {}
+        for variable in self.frame.columns:
+            missing_count = self.frame[self.frame[variable].isnull() | self.frame[variable].eq(0) | self.frame[variable].isin(['N/A', 'nill', 'null']) | (self.frame[variable].isna() & self.frame[variable].notna())][variable].count()
+            missing_counts[variable] = missing_count
+        return missing_counts
