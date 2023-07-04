@@ -112,6 +112,48 @@ def save_sets(X_train=None, y_train=None, X_val=None, y_val=None, X_test=None, y
       np.save(f'{path}y_test',  y_test)
 
 
+def save_sets_v2(X_train=None, y_train=None, X_val=None, y_val=None, X_test=None, y_test=None, path='../data/processed/', suffix=''):
+    """Save the different sets locally
+
+    Parameters
+    ----------
+    X_train: Numpy Array
+        Features for the training set
+    y_train: Numpy Array
+        Target for the training set
+    X_val: Numpy Array
+        Features for the validation set
+    y_val: Numpy Array
+        Target for the validation set
+    X_test: Numpy Array
+        Features for the testing set
+    y_test: Numpy Array
+        Target for the testing set
+    path : str
+        Path to the folder where the sets will be saved (default: '../data/processed/')
+    suffix : str
+        Suffix to be added to the file names (default: '')
+
+    Returns
+    -------
+    """
+    import numpy as np
+
+    if X_train is not None:
+      np.save(f'{path}X_train{suffix}', X_train)
+    if X_val is not None:
+      np.save(f'{path}X_val{suffix}',   X_val)
+    if X_test is not None:
+      np.save(f'{path}X_test{suffix}',  X_test)
+    if y_train is not None:
+      np.save(f'{path}y_train{suffix}', y_train)
+    if y_val is not None:
+      np.save(f'{path}y_val{suffix}',   y_val)
+    if y_test is not None:
+      np.save(f'{path}y_test{suffix}',  y_test)
+
+
+
 def load_sets(path='../data/processed/', val=False):
     """Load the different locally save sets
 
