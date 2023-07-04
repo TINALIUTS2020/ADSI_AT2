@@ -146,3 +146,19 @@ def load_sets(path='../data/processed/', val=False):
     y_test  = np.load(f'{path}y_test.npy' , allow_pickle=True) if os.path.isfile(f'{path}y_test.npy')  else None
     
     return X_train, y_train, X_val, y_val, X_test, y_test
+
+# Hash Encoding
+
+import pandas as pd
+import hashlib
+
+def hash_categorical_variable(value, num_buckets):
+    # Hash the categorical value and map it to a bucket/index
+    hash_value = int(hashlib.md5(value.encode('utf-8')).hexdigest(), 16)
+    bucket_index = hash_value % num_buckets
+    return bucket_index
+
+def apply_hashing_trick(df, column, num_buckets):
+    hashed_column = df[column].apply(lambda x: hash_categorical_variable(str(x), num_buckets))
+    df['hashed_' + column] = hashed_column
+    return df
