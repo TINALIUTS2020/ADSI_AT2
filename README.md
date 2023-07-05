@@ -54,4 +54,33 @@ Project Organization
 
 --------
 
+## Docker things
+
+- when importing modules now use ds.module.module instead of src.module.module
+- e.g. `from src.visualization.visualize import plot_column_dist` -> `from ds.visualization.visualize import plot_column_dist`
+
+### Install Docker
+
+- install docker desktop
+  - mac `brew install --cask docker`
+
+### Before Starting
+update .env file with keys
+```
+USER_NAME=<input your username>
+USER_ID=<input your userid>
+```
+
+### To start containers
+
+- from within the project root directory
+- to start all containers `docker compose up -d`
+- to start individual containers `docker compose up <service name> -d` e.g. `docker compose up tf -d`
+
+### once started
+1. attach to container with vscode
+2. open directory `~/dev/`
+3. open new terminal in vscode
+4. run `python -m pip install -r requirements.txt` (this include a editable package install for the project packages, no need to mess with path)
+
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
