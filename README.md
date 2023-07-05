@@ -54,4 +54,15 @@ Project Organization
 
 --------
 
+## Docker things
+
+### Install Docker
+
+- install docker desktop
+  - mac `brew install --cask docker`
+
+### To start containers
+
+- `docker compose up -d`
+
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
