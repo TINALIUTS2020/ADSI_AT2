@@ -189,6 +189,74 @@ def load_sets(path='../data/processed/', val=False):
     
     return X_train, y_train, X_val, y_val, X_test, y_test
 
+
+
+
+def load_sets_v2(path='../data/processed/', suffix=''):
+    """Load the different sets from the saved files
+
+    Parameters
+    ----------
+    path : str
+        Path to the folder where the sets are saved (default: '../data/processed/')
+    suffix : str
+        Suffix added to the file names (default: '')
+
+    Returns
+    -------
+    X_train : Numpy Array or None
+        Loaded features for the training set, or None if the file doesn't exist
+    y_train : Numpy Array or None
+        Loaded target for the training set, or None if the file doesn't exist
+    X_val : Numpy Array or None
+        Loaded features for the validation set, or None if the file doesn't exist
+    y_val : Numpy Array or None
+        Loaded target for the validation set, or None if the file doesn't exist
+    X_test : Numpy Array or None
+        Loaded features for the testing set, or None if the file doesn't exist
+    y_test : Numpy Array or None
+        Loaded target for the testing set, or None if the file doesn't exist
+    """
+    import numpy as np
+    X_train = None
+    y_train = None
+    X_val = None
+    y_val = None
+    X_test = None
+    y_test = None
+
+    try:
+        X_train = np.load(f'{path}X_train{suffix}.npy')
+    except FileNotFoundError:
+        pass
+
+    try:
+        y_train = np.load(f'{path}y_train{suffix}.npy')
+    except FileNotFoundError:
+        pass
+
+    try:
+        X_val = np.load(f'{path}X_val{suffix}.npy')
+    except FileNotFoundError:
+        pass
+
+    try:
+        y_val = np.load(f'{path}y_val{suffix}.npy')
+    except FileNotFoundError:
+        pass
+
+    try:
+        X_test = np.load(f'{path}X_test{suffix}.npy')
+    except FileNotFoundError:
+        pass
+
+    try:
+        y_test = np.load(f'{path}y_test{suffix}.npy')
+    except FileNotFoundError:
+        pass
+
+    return X_train, y_train, X_val, y_val, X_test, y_test
+
 # Hash Encoding
 
 import pandas as pd
