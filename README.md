@@ -56,6 +56,9 @@ Project Organization
 
 ## Docker things
 
+- when importing modules now use ds.module.module instead of src.module.module
+- e.g. `from src.visualization.visualize import plot_column_dist` -> `from ds.visualization.visualize import plot_column_dist`
+
 ### Install Docker
 
 - install docker desktop
