@@ -53,8 +53,8 @@ services:
       - .:/home/${USER_NAME}/dev:cache
 
     working_dir: /home/${USER_NAME}/dev/
+    tty: true
 
-    command: sleep infinity
 
   api:
     build:
@@ -72,5 +72,4 @@ services:
       - .:/home/${USER_NAME}/dev:cache
 
     working_dir: /home/${USER_NAME}/dev/
-
-    command: sleep infinity
+    tty: true
