@@ -70,15 +70,21 @@ update .env file with keys
 USER_NAME=<input your username>
 USER_ID=<input your userid>
 ```
+- for mac, in terminal `id` copy uid and username in brackets
+- for windows, it doesn't matter, but create the keys anyway, I would still use my username (without spaces) for userid use 1001
 
 ### To start containers
 
 - from within the project root directory
 - to start all containers `docker compose up -d`
 - to start individual containers `docker compose up <service name> -d` e.g. `docker compose up tf -d`
+  - you can see a list of service names in the docker compose file, currently tf, xgboost, api
 
 ### once started
+0. install docker and container extensions for vscode
+   1. ![vscode extensions](./references/readme_images/extensions.png "vscode extensions")
 1. attach to container with vscode
+   1. ![vscode attach](./references/readme_images/attach.jpg "vscode attach")
 2. open directory `~/dev/`
 3. open new terminal in vscode
 4. run `python -m pip install -r requirements.txt` (this include a editable package install for the project packages, no need to mess with path)
