@@ -16,9 +16,6 @@ services:
               count: all
               capabilities: [gpu]
 
-    environment:
-      - PATH=$${HOME}/.local/bin:$PATH
-
     # ports:
     #   - 8888:8888 # jupyter
     #   - 6006:6006 #tensorboard
@@ -46,9 +43,6 @@ services:
     #           count: all
     #           capabilities: [gpu]
 
-    environment:
-      - PATH=$${HOME}/.local/bin:$PATH
-
     volumes:
       - .:/home/${USER_NAME}/dev:cache
 
@@ -64,9 +58,6 @@ services:
         USERNAME: ${USER_NAME}
         USER_UID: ${USER_ID}
         WORKING_DIRECTORY: /home/${USER_NAME}/dev/
-
-    environment:
-      - PATH=$${HOME}/.local/bin:$PATH
 
     volumes:
       - .:/home/${USER_NAME}/dev:cache
