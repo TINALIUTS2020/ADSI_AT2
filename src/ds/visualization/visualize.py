@@ -86,3 +86,14 @@ def plot_model_loss(history,title):
     plt.legend(['train_loss', 'validation_loss'], loc='best')
     return
     plt.show()
+
+# Model- learning curve
+def plot_model_learningcurve(history,title):
+    import matplotlib.pyplot as plt
+    plt.plot(history['accuracy'], label='MSE training')
+    plt.plot(history['val_accuracy'], label='MSE validation')
+    plt.ylabel('accuracy')
+    plt.xlabel('Epoch')
+    plt.title(title)
+    return
+    plt.show()
