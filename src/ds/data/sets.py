@@ -318,9 +318,10 @@ class DataProcessor:
         processed_df = self.knn_imputer_numeric.fit_transform(processed_df)
         print("scaling")
         processed_df = self.scaler.fit_transform(processed_df)
-        
+        processed_df = pd.DataFrame(processed_df)
+
         print("concat")
-        processed_df = pd.concat([text_columns.values(), processed_df], axis=1)
+        processed_df = pd.concat(list(text_columns.values()) + [processed_df], axis=1)
         
         # Output as numpy array
         print("array")
