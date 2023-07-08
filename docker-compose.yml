@@ -25,9 +25,9 @@ services:
 
     working_dir: /home/${USER_NAME}/dev/
 
-  tf-mrco:
+  tfmarco:
     build:
-      context: ./containers/tf
+      context: ./containers/tfmarco
       dockerfile: ./Dockerfile
       args:
         USERNAME: ${USER_NAME}
