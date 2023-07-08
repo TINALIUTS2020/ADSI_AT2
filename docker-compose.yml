@@ -16,9 +16,27 @@ services:
     #           count: all
     #           capabilities: [gpu]
 
-    # ports:
-    #   - 8888:8888 # jupyter
-    #   - 6006:6006 #tensorboard
+    ports:
+      - 8889:888 # jupyter
+      - 6007:6006 #tensorboard
+
+    volumes:
+      - .:/home/${USER_NAME}/dev:cache
+
+    working_dir: /home/${USER_NAME}/dev/
+
+  tf-mrco:
+    build:
+      context: ./containers/tf
+      dockerfile: ./Dockerfile
+      args:
+        USERNAME: ${USER_NAME}
+        USER_UID: ${USER_ID}
+        WORKING_DIRECTORY: /home/${USER_NAME}/dev/
+
+    ports:
+      - 8888:8888 # jupyter
+      - 6006:6006 #tensorboard
 
     volumes:
       - .:/home/${USER_NAME}/dev:cache
@@ -33,15 +51,6 @@ services:
         USERNAME: ${USER_NAME}
         USER_UID: ${USER_ID}
         WORKING_DIRECTORY: /home/${USER_NAME}/dev/
-
-    # # might be able to use gpu later 
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
 
     volumes:
       - .:/home/${USER_NAME}/dev:cache
