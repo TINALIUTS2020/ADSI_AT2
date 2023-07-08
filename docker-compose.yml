@@ -8,13 +8,13 @@ services:
         USER_UID: ${USER_ID}
         WORKING_DIRECTORY: /home/${USER_NAME}/dev/
 
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
 
     # ports:
     #   - 8888:8888 # jupyter
