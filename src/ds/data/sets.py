@@ -226,32 +226,32 @@ def load_sets_v2(path='../data/processed/', suffix=''):
     y_test = None
 
     try:
-        X_train = np.load(f'{path}X_train{suffix}.npy')
+        X_train = np.load(f'{path}X_train{suffix}.npy', allow_pickle=True)
     except FileNotFoundError:
         pass
 
     try:
-        y_train = np.load(f'{path}y_train{suffix}.npy')
+        y_train = np.load(f'{path}y_train{suffix}.npy', allow_pickle=True)
     except FileNotFoundError:
         pass
 
     try:
-        X_val = np.load(f'{path}X_val{suffix}.npy')
+        X_val = np.load(f'{path}X_val{suffix}.npy', allow_pickle=True)
     except FileNotFoundError:
         pass
 
     try:
-        y_val = np.load(f'{path}y_val{suffix}.npy')
+        y_val = np.load(f'{path}y_val{suffix}.npy', allow_pickle=True)
     except FileNotFoundError:
         pass
 
     try:
-        X_test = np.load(f'{path}X_test{suffix}.npy')
+        X_test = np.load(f'{path}X_test{suffix}.npy', allow_pickle=True)
     except FileNotFoundError:
         pass
 
     try:
-        y_test = np.load(f'{path}y_test{suffix}.npy')
+        y_test = np.load(f'{path}y_test{suffix}.npy', allow_pickle=True)
     except FileNotFoundError:
         pass
 
@@ -272,3 +272,84 @@ def apply_hashing_trick(df, column, num_buckets):
     hashed_column = df[column].apply(lambda x: hash_categorical_variable(str(x), num_buckets))
     df['hashed_' + column] = hashed_column
     return df
+
+
+class DataProcessor:
+    """Class to Preprocess X_df (df without target)
+
+    Parameters
+    ----------
+    scaler: object
+        Pre-initialized scaler object
+    knn_imputer_numeric: object
+        Pre-initialized KNN imputer object
+    hashbuckets: int
+        Number of buckets to hash the categorical features
+    Returns
+    -------
+    np.array
+    """
+    def __init__(self, scaler, knn_imputer_numeric):
+        self.knn_imputer_numeric = knn_imputer_numeric
+        self.scaler = scaler
+
+    def process_dataframe(self, df, dest="../data/processed/", hashbuckets=10):
+        from ds.data.sets import apply_hashing_trick
+        import pandas as pd
+        import numpy as np
+        import os
+        import pickle
+        
+        # Parameter for the custom function apply_hashing_trick()
+        num_buckets = hashbuckets
+
+        processed_df = pd.DataFrame()
+        text_columns = {}  # Dictionary to store original text column names and hashed values
+
+        for column in df.columns:
+            if np.issubdtype(df[column].dtype, np.floating):
+                # Apply knn_imputer_numeric to numeric columns
+                self.knn_imputer_numeric.fit(df[[column]])  # Fit KNN imputer for each numeric column
+                imputed_values = self.knn_imputer_numeric.transform(df[[column]])
+                # Apply scaler to all numeric columns
+                self.scaler.fit(imputed_values)  # Fit scaler with imputed values
+                scaled_values = self.scaler.transform(imputed_values)
+                processed_df[column] = scaled_values.flatten()
+            else:
+                # Apply custom hashing trick to text columns
+                hashed_column = apply_hashing_trick(df, column, num_buckets)
+                processed_df = pd.concat([hashed_column, processed_df], axis=1)
+                processed_df.drop(column, axis=1, inplace=True)  # Remove original text column
+                text_columns[column] = hashed_column  # Store original text column name and hashed values
+        
+        # Output as numpy array
+        processed_array = processed_df.to_numpy()
+
+        # Save text_columns to pickle files
+        for column_name, hashed_values in text_columns.items():
+            pickle_path = os.path.join(dest, 'hashed_' + column_name + '.pkl')
+            with open(pickle_path, 'wb') as f:
+                pickle.dump(hashed_values, f)
+        
+        # Save the scaler and knn_imputer_numeric objects
+        scaler_path = os.path.join('../models/scaler.joblib')
+        knn_imputer_path = os.path.join('../models/knn_imputer_numeric.joblib')
+        from joblib import dump
+        dump(self.scaler, scaler_path)
+        dump(self.knn_imputer_numeric, knn_imputer_path)
+        
+        # Save the processed array as .npy
+        np.save(os.path.join(dest, 'X_processed.npy'), processed_array)
+
+        return processed_array
+
+
+"""
+# usage:
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import KNNImputer
+scaler = StandardScaler()
+knn_imputer_numeric = KNNImputer(n_neighbors = 10)
+data_processor = DataProcessor(scaler, knn_imputer_numeric)
+X_proceesed = data_processor.process_dataframe(df,dest = "../data/processed/", hashbuckets = 10)
+"""
