@@ -281,16 +281,16 @@ class DataProcessor:
     ----------
     scaler: object
         Pre-initialized scaler object
-    knn_imputer_numeric: object
-        Pre-initialized KNN imputer object
+    imputer_numeric: object
+        Pre-initialized imputer object
     hashbuckets: int
         Number of buckets to hash the categorical features
     Returns
     -------
     np.array
     """
-    def __init__(self, scaler, knn_imputer_numeric):
-        self.knn_imputer_numeric = knn_imputer_numeric
+    def __init__(self, scaler, imputer_numeric):
+        self.imputer_numeric = imputer_numeric
         self.scaler = scaler
 
     def process_dataframe(self, df, dest="../data/processed/", hashbuckets=10):
@@ -315,7 +315,7 @@ class DataProcessor:
 
         print("imputing")
         # impute_df = df.drop(columns=text_columns.keys())
-        processed_df = self.knn_imputer_numeric.fit_transform(processed_df)
+        processed_df = self.imputer_numeric.fit_transform(processed_df)
         print("scaling")
         processed_df = self.scaler.fit_transform(processed_df)
         
@@ -335,10 +335,10 @@ class DataProcessor:
         
         # Save the scaler and knn_imputer_numeric objects
         scaler_path = os.path.join('../models/scaler.joblib')
-        knn_imputer_path = os.path.join('../models/knn_imputer_numeric.joblib')
+        imputer_path = os.path.join('../models/imputer_numeric.joblib')
         from joblib import dump
         dump(self.scaler, scaler_path)
-        dump(self.knn_imputer_numeric, knn_imputer_path)
+        dump(self.imputer_numeric, imputer_path)
         
         # Save the processed array as .npy
         np.save(os.path.join(dest, 'X_processed.npy'), processed_array)
@@ -351,7 +351,8 @@ class DataProcessor:
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import KNNImputer
 scaler = StandardScaler()
-knn_imputer_numeric = KNNImputer(n_neighbors = 10)
-data_processor = DataProcessor(scaler, knn_imputer_numeric)
+imputer_numeric = KNNImputer(n_neighbors = 10)
+or imputer_numeric = SimpleImputer(strategy='mean')
+data_processor = DataProcessor(scaler, imputer_numeric)
 X_proceesed = data_processor.process_dataframe(df,dest = "../data/processed/", hashbuckets = 10)
 """
