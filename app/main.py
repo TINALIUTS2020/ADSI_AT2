@@ -5,7 +5,7 @@ import pandas as pd
 
 app = FastAPI()
 
-#model_name = load('../model_path.joblib')
+#model_name = load('MODEL PATH.joblib')
 
 # '/' (GET) - Display project information and endpoints
 @app.get('/')
