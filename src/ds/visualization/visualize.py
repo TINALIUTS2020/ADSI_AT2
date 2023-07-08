@@ -59,3 +59,30 @@ def plot_column_dist(data, column_name, top_n=None):
     plt.subplots_adjust(bottom=0.3)
     return
     plt.show()
+
+
+
+
+# Chart for model accuracy
+def plot_model_accuracy(history,title):
+    import matplotlib.pyplot as plt
+    plt.title(title)
+    plt.plot(history['accuracy'])
+    plt.plot(history['val_accuracy'])
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train_accuracy', 'validation_accuracy'], loc='best')
+    return
+    plt.show()
+
+# Chart for model loss
+def plot_model_loss(history,title):
+    import matplotlib.pyplot as plt
+    plt.title(title)
+    plt.plot(history['loss'])
+    plt.plot(history['val_loss'])
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train_loss', 'validation_loss'], loc='best')
+    return
+    plt.show()
