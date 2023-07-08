@@ -270,8 +270,8 @@ def hash_categorical_variable(value, num_buckets):
 
 def apply_hashing_trick(df, column, num_buckets):
     hashed_column = df[column].apply(lambda x: hash_categorical_variable(str(x), num_buckets))
-    df['hashed_' + column] = hashed_column
-    return df
+    hashed_column = hashed_column.rename(f"hashed_{column}")
+    return hashed_column
 
 
 class DataProcessor:
@@ -303,28 +303,30 @@ class DataProcessor:
         # Parameter for the custom function apply_hashing_trick()
         num_buckets = hashbuckets
 
-        processed_df = pd.DataFrame()
+        processed_df = df.copy(deep=True)
         text_columns = {}  # Dictionary to store original text column names and hashed values
 
-        for column in df.columns:
-            if np.issubdtype(df[column].dtype, np.floating):
-                # Apply knn_imputer_numeric to numeric columns
-                self.knn_imputer_numeric.fit(df[[column]])  # Fit KNN imputer for each numeric column
-                imputed_values = self.knn_imputer_numeric.transform(df[[column]])
-                # Apply scaler to all numeric columns
-                self.scaler.fit(imputed_values)  # Fit scaler with imputed values
-                scaled_values = self.scaler.transform(imputed_values)
-                processed_df[column] = scaled_values.flatten()
-            else:
-                # Apply custom hashing trick to text columns
+        for column in processed_df.columns:
+           if all(pd.isna(v) or isinstance(v, str) for v in processed_df[column]):
+                print("hashing")
                 hashed_column = apply_hashing_trick(df, column, num_buckets)
-                processed_df = pd.concat([hashed_column, processed_df], axis=1)
                 processed_df.drop(column, axis=1, inplace=True)  # Remove original text column
                 text_columns[column] = hashed_column  # Store original text column name and hashed values
+
+        print("imputing")
+        # impute_df = df.drop(columns=text_columns.keys())
+        processed_df = self.knn_imputer_numeric.fit_transform(processed_df)
+        print("scaling")
+        processed_df = self.scaler.fit_transform(processed_df)
+        
+        print("concat")
+        processed_df = pd.concat([text_columns.values(), processed_df], axis=1)
         
         # Output as numpy array
+        print("array")
         processed_array = processed_df.to_numpy()
 
+        print("saving")
         # Save text_columns to pickle files
         for column_name, hashed_values in text_columns.items():
             pickle_path = os.path.join(dest, 'hashed_' + column_name + '.pkl')
@@ -341,7 +343,7 @@ class DataProcessor:
         # Save the processed array as .npy
         np.save(os.path.join(dest, 'X_processed.npy'), processed_array)
 
-        return processed_array
+        return processed_df, processed_array
 
 
 """
