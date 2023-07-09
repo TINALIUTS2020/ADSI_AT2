@@ -2,16 +2,23 @@ from typing import Union, List
 
 from fastapi import FastAPI, status, Response, HTTPException
 
-from starlette.responses import PlainTextResponse
+from starlette.responses import PlainTextResponse, HTMLResponse
 from pydantic import BaseModel
 
 from api.DataModels import SingleInput, SingleResponse
+from api.HomePage import HomePage
 
 from joblib import load
 import pandas as pd
 
 
-app = FastAPI()
+app = FastAPI(
+    title="ADSI AT2 BEER API",
+    description="This API provides predictions for beer types based on given input parameters.",
+    summary="What beer are you drinking?",
+    version="0.0.1",
+    redoc_url=None,
+)
 # TODO: Add some api key in header request
 
 #model_name = load('MODEL PATH.joblib')
@@ -19,27 +26,8 @@ app = FastAPI()
 # '/' (GET) - Display project information and endpoints
 @app.get('/')
 async def home():
-    info = {
-        'description': 'This API provides predictions for beer types based on given input parameters.',
-        'endpoints': {
-            '/': 'Display project information and endpoints',
-            '/health/': 'Return a welcome message',
-            '/beer/type/': 'Return prediction for a single input',
-            '/beers/type/': 'Return predictions for multiple inputs',
-            '/model/architecture/': 'Display the architecture of the Neural Networks'
-        },
-        'input_parameters': {
-            'brewery_name': 'string',
-            'review_aroma': 'float',
-            'review_appearance': 'float',
-            'review_palate': 'float',
-            'review_taste': 'float',
-            'beer_abv': 'float'
-        },
-        'output_format': 'JSON',
-        'github_repo': 'https://github.com/TINALIUTS2020/ADSI_AT2'
-    }
-    return info
+    homepage = HomePage()
+    return HTMLResponse(content=homepage.page)
 
 
 # '/health/' (GET) - Return a welcome message
