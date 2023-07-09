@@ -2,11 +2,12 @@ from typing import Union, List
 
 from fastapi import FastAPI, status, Response, HTTPException
 
-from starlette.responses import PlainTextResponse, HTMLResponse
+from starlette.responses import PlainTextResponse, HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
 from api.DataModels import SingleInput, SingleResponse
 from api.HomePage import HomePage
+from api.Predictor import predict
 
 from joblib import load
 import pandas as pd
@@ -21,19 +22,19 @@ app = FastAPI(
 )
 # TODO: Add some api key in header request
 
-#model_name = load('MODEL PATH.joblib')
 
 # '/' (GET) - Display project information and endpoints
-@app.get('/')
+@app.get('/', include_in_schema=False)
 async def home():
-    homepage = HomePage()
-    return HTMLResponse(content=homepage.page)
+    # homepage = HomePage()
+    # return HTMLResponse(content=homepage.page)
+    return RedirectResponse(url='/docs')
 
 
 # '/health/' (GET) - Return a welcome message
 @app.get('/health/', status_code=status.HTTP_200_OK)
 def health():
-    return 'Welcome to the Beer API! The Nueral is brewed and awaiting your request'
+    return 'Welcome to the Beer API! The weights and biases have been brewed and are a-waiting your request'
 
 
 # '/beer/type/' (POST) - Return prediction for a single input
@@ -47,6 +48,11 @@ async def predict_single(
     review_taste: Union[float, None]=None,
     beer_abv: Union[float, None]=None,
 ) -> SingleResponse:
+    """
+     Submit requests for predictions on single beer.
+
+     Can use either query parameters or json body to submit request but not both.
+    """
     
     request_vars = [
         brewery_name,
@@ -71,8 +77,6 @@ async def predict_single(
             detail="provide either data in body json or as query parameters not both", 
         )
     
-    #TODO: error handle for if all of the json body is none
-    
     if input_data:
         data = input_data
 
@@ -85,30 +89,43 @@ async def predict_single(
             "review_taste": review_taste,
             "beer_abv": beer_abv,
         }
-        data = SingleInput.model_validate(data)
+        data = SingleInput.parse_obj(data)
 
-    prediction = await predict(data)
+    if data is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="data could not be set, please raise issue on github with request example", 
+        )
+
     # Perform prediction based on input data
+    prediction = await predict(data)
 
     return prediction
 
 
 # '/beers/type/' (POST) - Return predictions for multiple inputs
 @app.post('/beers/type/', status_code=status.HTTP_200_OK)
-def predict_multiple(
+async def predict_multiple(
     input_data: Union[List[SingleInput], None]=None,
 ):
+    """
+     Submit requests for predictions of multiple beers.
 
-    if all(arg is None for arg in locals().values()):
+     Provide a list/array of where each element of the list is a of input variables to predict a beery type.
+    """
+    
 
-        data = request.json()
+    if input_data is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No data provided", 
+        )
+    
     # Perform predictions based on input data
-    predictions = [
-        {'beer_type': 'predicted_type_1'},
-        {'beer_type': 'predicted_type_2'},
-        {'beer_type': 'predicted_type_3'}
-    ]
-    return predictions
+    prediction = [await predict(data) for data in input_data]
+
+
+    return prediction
 
 
 # '/model/architecture/' (GET) - Display the architecture of the Neural Networks
