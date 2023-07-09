@@ -59,17 +59,33 @@ services:
     tty: true
 
 
-  api:
+  api_dev:
     build:
-      context: ./containers/api
+      context: ./containers/api_dev
       dockerfile: ./Dockerfile
       args:
         USERNAME: ${USER_NAME}
         USER_UID: ${USER_ID}
         WORKING_DIRECTORY: /home/${USER_NAME}/dev/
+        INTERNAL_PORT: 8999
+
+    ports:
+      - 8999:8999
 
     volumes:
       - .:/home/${USER_NAME}/dev:cache
 
     working_dir: /home/${USER_NAME}/dev/
     tty: true
+
+  api_prod:
+    build:
+      context: ./containers/api_prod
+      dockerfile: ./Dockerfile
+      args:
+        USERNAME: appuser
+        USER_UID: 1001
+        WORKING_DIRECTORY: /app
+
+    ports:
+      - 8998:8080
