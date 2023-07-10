@@ -21,8 +21,8 @@ RUN groupadd --gid $USER_GID $USERNAME \
 ENV PATH="/home/${USERNAME}/.local/bin:$PATH"
 
 COPY requirements.txt /tmp/requirements.txt
-RUN python -m pip install -r /tmp/requirements.txt \
-    && apt install git
+RUN python -m pip install -r /tmp/requirements.txt
+RUN apt update && apt install -y git
 
 USER $USERNAME
 
