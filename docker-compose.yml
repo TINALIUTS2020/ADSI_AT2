@@ -17,7 +17,7 @@ services:
               capabilities: [gpu]
 
     ports:
-      - 8889:888 # jupyter
+      - 8889:8888 # jupyter
       - 6007:6006 #tensorboard
 
     volumes:
@@ -35,8 +35,8 @@ services:
         WORKING_DIRECTORY: /home/${USER_NAME}/dev/
 
     ports:
-      - 8888:8888 # jupyter
-      - 6006:6006 #tensorboard
+      - 8890:8888 # jupyter
+      - 6008:6006 #tensorboard
 
     volumes:
       - .:/home/${USER_NAME}/dev:cache
@@ -67,10 +67,10 @@ services:
         USERNAME: ${USER_NAME}
         USER_UID: ${USER_ID}
         WORKING_DIRECTORY: /home/${USER_NAME}/dev/
-        INTERNAL_PORT: 80
+        PORT: 80
 
     ports:
-      - 80:8081
+      - 8081:80
 
     volumes:
       - .:/home/${USER_NAME}/dev:cache
@@ -86,6 +86,7 @@ services:
         USERNAME: appuser
         USER_UID: 1001
         WORKING_DIRECTORY: /app
+        PORT: 80
 
     ports:
-      - 8998:8080
+      - 8082:80
