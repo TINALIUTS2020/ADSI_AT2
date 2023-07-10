@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:latest-gpu-jupyter
+FROM tensorflow/tensorflow:2.12.0-gpu-jupyter
 
 ARG USERNAME=default
 ARG USER_UID=1000
