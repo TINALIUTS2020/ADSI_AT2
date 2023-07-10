@@ -80,8 +80,8 @@ services:
 
   api_prod:
     build:
-      context: ./containers/api_prod
-      dockerfile: ./Dockerfile
+      context: ./
+      dockerfile: ./containers/api_prod/Dockerfile
       args:
         USERNAME: appuser
         USER_UID: 1001

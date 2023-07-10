@@ -17,10 +17,11 @@ ENV PORT=$PORT
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
 
-COPY requirements.txt /tmp/requirements.txt
+COPY ./containers/api_prod/requirements.txt /tmp/requirements.txt
 RUN python -m pip install -r /tmp/requirements.txt
 
 COPY ./app /app
+COPY ./src /app/src
 RUN python -m pip install /app
 RUN ["chmod", "+x", "/app/run.sh"]
 USER $USERNAME
