@@ -4,6 +4,32 @@ import pandas as pd
 import tensorflow as tf
 import numpy as np
 from pathlib import Path
+import logging
+import signal, os
+
+
+# stopper
+stop_flag = False
+
+class TerminateOnFlag(tf.keras.callbacks.Callback):
+    """Callback that terminates training when flag=1 is encountered.
+    """
+
+    def on_batch_end(self, batch, logs=None):
+        if stop_flag==1:    
+            self.model.stop_training = True
+
+
+
+def handler(signum, frame):
+    logging.info('SIGINT signal received. Training will finish after this epoch')
+    global stop_flag
+    stop_flag = True
+
+signal.signal(signal.SIGINT, handler)
+terminateOnFlag = TerminateOnFlag()
+
+
 
 # set vars
 BATCH_SIZE = 10000
@@ -127,11 +153,9 @@ for name in categorical_feature_names:
   x = lookup(x)
   preprocessed.append(x)
 
-# combine
-preprocesssed_result = tf.concat(preprocessed, axis=-1)
-preprocessor = tf.keras.Model(inputs, preprocesssed_result)
+preprocessor = tf.keras.Model(inputs, preprocessed)
+concater = tf.keras.layers.Concatenate(axis=-1)
 
-proc = preprocessor(inputs)
 
 # model body
 body = tf.keras.Sequential(
@@ -149,7 +173,10 @@ body = tf.keras.Sequential(
 )
 
 # compile model
-result = body(proc)
+
+x = preprocessor(inputs)
+x = concater(x)
+result = body(x)
 model = tf.keras.Model(inputs, result)
 
 model.compile(optimizer='adam',
@@ -176,14 +203,17 @@ reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
     min_lr=0.00000000001
 )
 
+
+
 history = model.fit(
     train,
-    epochs=20,
+    epochs=512,
     batch_size=BATCH_SIZE,
     validation_data=test,
     callbacks=[        
         earlystop_callback,
-        reduce_lr
+        reduce_lr,
+        terminateOnFlag
     ]
 )
 
@@ -213,3 +243,5 @@ target_vocab = np.array(target_vocab)
 
 np.save(target_lookup_path, target_vocab)
 model.save(save_path, save_format="keras")
+
+# model.export(save_path/ "export/done")
