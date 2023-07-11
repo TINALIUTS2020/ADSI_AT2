@@ -27,6 +27,8 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # ********************************************************
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
+RUN apt-get update && apt-get install -y graphviz
+
 USER $USERNAME
 
 ENV PATH="/home/${USERNAME}/.local/bin:$PATH"
