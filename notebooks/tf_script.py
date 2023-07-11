@@ -38,7 +38,7 @@ target_lookup = tf.keras.layers.StringLookup(vocabulary=y_vocab, output_mode='on
 target = target_lookup(y_tensor)
 
 # create training dataset
-train = tf.data.Dataset.from_tensor_slices((dict(x_test), target))
+train = tf.data.Dataset.from_tensor_slices((dict(x_train), target))
 train = train.batch(BATCH_SIZE)
 
 # create tes dataset
