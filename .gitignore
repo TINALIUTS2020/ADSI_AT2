@@ -90,3 +90,6 @@ target/
 
 /models/gpu/
 /app/model
+
+# exclude final model as it's too big
+/models/goodmod_13/
