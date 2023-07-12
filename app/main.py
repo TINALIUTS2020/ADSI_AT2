@@ -80,7 +80,7 @@ async def predict_single(
     if input_data:
         data = input_data
 
-    if any(request_vars):
+    elif any(request_vars):
         data = {
             "brewery_name": brewery_name,
             "review_aroma": review_aroma,
@@ -107,13 +107,12 @@ async def predict_single(
 @app.post('/beers/type/', status_code=status.HTTP_200_OK)
 async def predict_multiple(
     input_data: Union[List[SingleInput], None]=None,
-):
+) -> List[SingleResponse]:
     """
      Submit requests for predictions of multiple beers.
 
      Provide a list/array of where each element of the list is a of input variables to predict a beery type.
     """
-    
 
     if input_data is None:
         raise HTTPException(
@@ -122,9 +121,8 @@ async def predict_multiple(
         )
     
     # Perform predictions based on input data
-    prediction = [await predict(data) for data in input_data]
-
-
+    # will be slow because handling per input
+    prediction = await predict(input_data)
     return prediction
 
 

@@ -1,4 +1,4 @@
 #!/bin/bash
 python -m pip install -r requirements.txt
 
-uvicorn app.main:app --reload --port ${PORT}
+uvicorn app.main:app --proxy-headers --host 0.0.0.0 --port ${PORT} --reload
