@@ -89,3 +89,6 @@ target/
 .mypy_cache/
 
 /models/gpu/
+
+# exclude final model as it's too big
+/models/goodmod_13/
