@@ -153,9 +153,10 @@ for name in categorical_feature_names:
   x = lookup(x)
   preprocessed.append(x)
 
-preprocessor = tf.keras.Model(inputs, preprocessed)
-concater = tf.keras.layers.Concatenate(axis=-1)
 
+concater = tf.keras.layers.Concatenate(axis=-1)
+result1 = concater(preprocessed)
+preprocessor = tf.keras.Model(inputs, result1)
 
 # model body
 body = tf.keras.Sequential(
@@ -163,30 +164,62 @@ body = tf.keras.Sequential(
         tf.keras.layers.Dense(2048, activation='relu'),
         tf.keras.layers.Dense(1024, activation='relu'),
         tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Dropout(0.1),
+        tf.keras.layers.Dropout(0.2),
         tf.keras.layers.Dense(1024, activation='relu'),
         tf.keras.layers.Dense(512, activation='relu'),
         tf.keras.layers.Dense(2048, activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(1024, activation='relu'),
+        tf.keras.layers.Dense(2048, activation='relu'),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Dropout(0.1),
+        tf.keras.layers.Dense(1024, activation='relu'),
+        tf.keras.layers.Dense(2048, activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.1),
+        tf.keras.layers.Dense(1024, activation='relu'),
         tf.keras.layers.Dense(target_lookup.vocabulary_size(), activation='softmax', bias_initializer=output_bias_init, name="output_layer")
     ]
 )
 
 # compile model
 
-x = preprocessor(inputs)
-x = concater(x)
-result = body(x)
-model = tf.keras.Model(inputs, result)
+x2 = preprocessor(inputs)
+result2 = body(x2)
+model = tf.keras.Model(inputs, result2)
 
-model.compile(optimizer='adam',
+# optmizer
+opt = tf.keras.optimizers.Adam(
+    learning_rate=0.00005,
+    beta_1=0.9,
+    beta_2=0.999,
+    epsilon=1e-07,
+    amsgrad=False,
+    weight_decay=None,
+    clipnorm=None,
+    clipvalue=None,
+    global_clipnorm=None,
+    use_ema=False,
+    ema_momentum=0.99,
+    ema_overwrite_frequency=None,
+    jit_compile=True,
+)
+
+topk = tf.keras.metrics.TopKCategoricalAccuracy(
+    k=3, name="top_k_categorical_accuracy", dtype=None
+)
+
+
+### compile
+model.compile(optimizer=opt,
                 loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False),
-                metrics=['accuracy'])
+                metrics=['accuracy', topk])
 
 # setup for trian
 earlystop_callback = tf.keras.callbacks.EarlyStopping(
     monitor="val_loss",
-    min_delta=0.000001,
+    min_delta=0.0000000001,
     patience=32,
     verbose=0,
     restore_best_weights=True,
@@ -198,9 +231,9 @@ reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
     patience=16,
     verbose=0,
     mode='auto',
-    min_delta=0.0001,
+    min_delta=0.0000001,
     cooldown=4,
-    min_lr=0.00000000001
+    min_lr=0.00000000000001
 )
 
 
