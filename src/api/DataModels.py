@@ -74,7 +74,7 @@ class SingleInput(BaseModel):
                 # },
 
 class SingleResponse(SingleInput):
-    beer_type: str
+    beer_style: str
 
     # TODO: update example
     class Config:
@@ -87,7 +87,7 @@ class SingleResponse(SingleInput):
                     "review_palate": 4,
                     "review_taste": 4,
                     "beer_abv": 2.4,
-                    "beer_type": "Best IPA",
+                    "beer_style": "Best IPA",
                 },
             ]
         }

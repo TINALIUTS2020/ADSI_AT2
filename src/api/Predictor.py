@@ -6,35 +6,35 @@ from api.tf_model import make_prediction
 
 from fastapi import status, HTTPException
 
-async def predict(data: Union[SingleInput, list]):
+import pandas as pd
+
+
+async def predict(data: Union[SingleInput, list], single_input=False):
     # pydantic should prevent malformed data
     # format strings
     # moved none repalcement and type setting to datamodel
-    ref = {field: [] for field in SingleInput.__fields__.keys()}
-
     if isinstance(data, SingleInput):
         data = [data]
 
     parsed = [input.dict() for input in data]
+    parsed = [{key: value if key != "brewery_name" else clean_string(value) for key, value in input.items()} for input in parsed]
+    parsed = pd.DataFrame(parsed)
 
-    for input in parsed:
-        for key, value in input.items():
-            if key == "brewery_name":
-                value = clean_string(value)
-            ref[key].append(value)
-
-    predictions = await make_prediction(ref)
+    predictions = await make_prediction(parsed)
+    from logging import warning
     
-    if len(predictions) != len(parsed):
+    if predictions.size != parsed.shape[0]:
         raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="missmatched predictions", 
                 )
+        
+    parsed["beer_style"] = predictions
 
-    for input_data, pred_out in zip(parsed, predictions):
-        input_data["beer_style"] = pred_out
-
-    out = [SingleResponse.parse_obj(compiled) for compiled in parsed]
+    out = parsed.to_dict("records")
+    out = [SingleResponse.parse_obj(compiled) for compiled in out]
+    if single_input:
+        out = out[0]
     return out 
 
 
