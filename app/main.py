@@ -12,6 +12,9 @@ from api.tf_model import get_architecture
 
 from joblib import load
 import pandas as pd
+import os
+import tensorflow as tf
+from numpy import load as npload
 
 
 app = FastAPI(
@@ -22,6 +25,18 @@ app = FastAPI(
     redoc_url=None,
 )
 # TODO: Add some api key in header request
+
+if os.environ["CURRENT_CONTAINER"] == "api_dev":
+    model = tf.keras.models.load_model("/home/projects/dev/app/model/prod_model")
+else:
+    model = tf.keras.models.load_model("/app/model/prod_model")
+
+if os.environ["CURRENT_CONTAINER"] == "api_dev":
+    vocab = npload("/home/projects/dev/app/model/vocab_prod_model.npy")
+else:
+    vocab = npload("/app/model/vocab_prod_model.npy")
+
+lookup = tf.keras.layers.StringLookup(vocabulary=vocab, invert=True)
 
 
 # '/' (GET) - Display project information and endpoints
@@ -98,7 +113,7 @@ async def predict_single(
         )
 
     # Perform prediction based on input data
-    prediction = await predict(data, single_input=True)
+    prediction = await predict(data, single_input=True, model=model, lookup=lookup)
 
     return prediction
 
@@ -122,7 +137,7 @@ async def predict_multiple(
     
     # Perform predictions based on input data
     # will be slow because handling per input
-    prediction = await predict(input_data, single_input=False)
+    prediction = await predict(input_data, single_input=False, model=model, lookup=lookup)
     return prediction
 
 
@@ -136,5 +151,5 @@ async def predict_multiple(
     response_class=Response
 )
 async def model_architecture():
-    image_bytes: bytes = await get_architecture()
+    image_bytes: bytes = await get_architecture(model)
     return Response(content=image_bytes, media_type="image/png")

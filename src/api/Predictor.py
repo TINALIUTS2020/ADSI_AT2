@@ -9,7 +9,7 @@ from fastapi import status, HTTPException
 import pandas as pd
 
 
-async def predict(data: Union[SingleInput, list], single_input=False):
+async def predict(data: Union[SingleInput, list], single_input=False, model=None, lookup=None):
     # pydantic should prevent malformed data
     # format strings
     # moved none repalcement and type setting to datamodel
@@ -20,7 +20,7 @@ async def predict(data: Union[SingleInput, list], single_input=False):
     parsed = [{key: value if key != "brewery_name" else clean_string(value) for key, value in input.items()} for input in parsed]
     parsed = pd.DataFrame(parsed)
 
-    predictions = await make_prediction(parsed)
+    predictions = await make_prediction(parsed, model=model, lookup=lookup)
     from logging import warning
     
     if predictions.size != parsed.shape[0]:

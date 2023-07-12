@@ -3,33 +3,19 @@ import os
 import tensorflow as tf
 from numpy import load as npload
 
-async def make_prediction(data):
-    if os.environ["CURRENT_CONTAINER"] == "api_dev":
-        model = tf.keras.models.load_model("/home/projects/dev/app/model/prod_model")
-    else:
-        model = tf.keras.models.load_model("/app/model/prod_model")
+async def make_prediction(data, model=None, lookup=None):
 
     predictions = model.predict(dict(data))
 
-    return await parse_predictions(predictions)
+    return await parse_predictions(predictions, lookup)
 
-async def parse_predictions(predictions):
-    if os.environ["CURRENT_CONTAINER"] == "api_dev":
-        vocab = npload("/home/projects/dev/app/model/vocab_prod_model.npy")
-    else:
-        vocab = npload("/app/model/vocab_prod_model.npy")
-
-    lookup = tf.keras.layers.StringLookup(vocabulary=vocab, invert=True)
+async def parse_predictions(predictions, lookup):
 
     predictions = tf.argmax(predictions, axis=-1)
     predictions = lookup(predictions)
     return predictions.numpy()
 
-async def get_architecture():
-    if os.environ["CURRENT_CONTAINER"] == "api_dev":
-        model = tf.keras.models.load_model("/home/projects/dev/app/model/prod_model")
-    else:
-        model = tf.keras.models.load_model("/app/model/prod_model")
+async def get_architecture(model):
 
     arch = tf.keras.utils.model_to_dot(model, show_shapes=True, show_layer_names=True, expand_nested=True, rankdir="TD")
     return arch.create_png(prog="dot")
