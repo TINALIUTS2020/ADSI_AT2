@@ -1,6 +1,6 @@
 from typing import Union
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field, root_validator, validator
 from pydantic.dataclasses import dataclass
 
 
@@ -19,9 +19,37 @@ class SingleInput(BaseModel):
         if not any(v.values()):
             raise ValueError('atleast one field must be filled')
         return v
+    
+    @validator("brewery_name", always=True)
+    def set_brewery_name(cls, v):
+        return v or "[UNK]"
+    
+    @validator("review_aroma", always=True)
+    def set_review_aroma(cls, v):
+        return v or float(-9)
+    
+    @validator("review_appearance", always=True)
+    def set_review_appearance(cls, v):
+        return v or float(-9)
+    
+    @validator("review_palate", always=True)
+    def set_review_palate(cls, v):
+        return v or float(-9)
+    
+    @validator("review_taste", always=True)
+    def set_review_taste(cls, v):
+        return v or float(-9)
+    
+    @validator("beer_abv", always=True)
+    def set_beer_abv(cls, v):
+        return v or float(-9)
+
+
+
 
     # TODO: update example
     class Config:
+        validate_assignment = True
         schema_extra = {
             "examples": [
                 {
@@ -46,7 +74,7 @@ class SingleInput(BaseModel):
                 # },
 
 class SingleResponse(SingleInput):
-    beer_type: str
+    beer_style: str
 
     # TODO: update example
     class Config:
@@ -59,7 +87,7 @@ class SingleResponse(SingleInput):
                     "review_palate": 4,
                     "review_taste": 4,
                     "beer_abv": 2.4,
-                    "beer_type": "Best IPA",
+                    "beer_style": "Best IPA",
                 },
             ]
         }

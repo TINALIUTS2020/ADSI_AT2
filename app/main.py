@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from api.DataModels import SingleInput, SingleResponse
 from api.HomePage import HomePage
 from api.Predictor import predict
+from api.tf_model import get_architecture
 
 from joblib import load
 import pandas as pd
@@ -53,7 +54,6 @@ async def predict_single(
 
      Can use either query parameters or json body to submit request but not both.
     """
-    
     request_vars = [
         brewery_name,
         review_aroma,
@@ -80,7 +80,7 @@ async def predict_single(
     if input_data:
         data = input_data
 
-    if any(request_vars):
+    elif any(request_vars):
         data = {
             "brewery_name": brewery_name,
             "review_aroma": review_aroma,
@@ -98,7 +98,7 @@ async def predict_single(
         )
 
     # Perform prediction based on input data
-    prediction = await predict(data)
+    prediction = await predict(data, single_input=True)
 
     return prediction
 
@@ -107,13 +107,12 @@ async def predict_single(
 @app.post('/beers/type/', status_code=status.HTTP_200_OK)
 async def predict_multiple(
     input_data: Union[List[SingleInput], None]=None,
-):
+) -> List[SingleResponse]:
     """
      Submit requests for predictions of multiple beers.
 
      Provide a list/array of where each element of the list is a of input variables to predict a beery type.
     """
-    
 
     if input_data is None:
         raise HTTPException(
@@ -122,20 +121,20 @@ async def predict_multiple(
         )
     
     # Perform predictions based on input data
-    prediction = [await predict(data) for data in input_data]
-
-
+    # will be slow because handling per input
+    prediction = await predict(input_data, single_input=False)
     return prediction
 
 
 # '/model/architecture/' (GET) - Display the architecture of the Neural Networks
-@app.get('/model/architecture/')
-def model_architecture():
-    architecture = {
-        'layers': [
-            {'name': 'layer_1', 'type': 'type_1'},
-            {'name': 'layer_2', 'type': 'type_2'},
-            {'name': 'layer_3', 'type': 'type_3'}
-        ]
-    }
-    return architecture
+@app.get('/model/architecture/',
+    responses={
+        200: {
+            "content": {"image/png": {}}
+        }
+    },
+    response_class=Response
+)
+async def model_architecture():
+    image_bytes: bytes = await get_architecture()
+    return Response(content=image_bytes, media_type="image/png")

@@ -23,9 +23,10 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 ENV PATH="/home/${USERNAME}/.local/bin:$PATH"
 
+RUN apt-get update && apt-get install -y git graphviz
 COPY requirements.txt /tmp/requirements.txt
 RUN python -m pip install -r /tmp/requirements.txt
-RUN apt-get update && apt-get install -y git
+
 
 
 

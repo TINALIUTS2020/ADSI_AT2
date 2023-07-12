@@ -19,8 +19,11 @@ ENV CURRENT_CONTAINER=${CURRENT_CONTAINER}
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
 
+RUN apt-get update && apt-get install -y graphviz
+
 COPY ./containers/api_prod/requirements.txt /tmp/requirements.txt
 RUN python -m pip install -r /tmp/requirements.txt
+
 
 COPY ./app /app
 COPY ./src /app/src
