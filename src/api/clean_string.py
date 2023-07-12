@@ -1,4 +1,5 @@
 import re
+from unicodedata import normalize
 
 def clean_string(string: str) -> str:
     """Clean a string.
@@ -10,7 +11,7 @@ def clean_string(string: str) -> str:
         str: Cleaned string.
     """
     # tempting to make a wrapper
-    string = string.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+    string = normalize('NFKD', string).encode('ascii', errors='ignore').decode('utf-8')
     string = string.lower().strip()
     string = re.sub(r"[^\w\s\d/]", "", string)
     string = re.sub(r"\s+", " ", string).strip()
