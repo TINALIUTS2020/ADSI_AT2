@@ -31,6 +31,6 @@ async def get_architecture():
     else:
         model = tf.keras.models.load_model("/app/model/prod_model")
 
-    arch = tf.keras.utils.plot_model(model, to_file="./models/fancy_model_pic.png", show_shapes=True, show_layer_names=True, expand_nested=True, rankdir="TD")
-    return arch
+    arch = tf.keras.utils.model_to_dot(model, show_shapes=True, show_layer_names=True, expand_nested=True, rankdir="TD")
+    return arch.create_png(prog="dot")
      
