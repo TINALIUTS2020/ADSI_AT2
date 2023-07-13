@@ -17,6 +17,6 @@ async def parse_predictions(predictions, lookup):
 
 async def get_architecture(model):
 
-    arch = tf.keras.utils.model_to_dot(model, show_shapes=True, show_layer_names=True, expand_nested=True, rankdir="TD")
+    arch = tf.keras.utils.model_to_dot(model, show_shapes=True, show_layer_names=True,  rankdir="TD")
     return arch.create_png(prog="dot")
      

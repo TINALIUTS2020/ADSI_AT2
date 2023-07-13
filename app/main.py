@@ -96,7 +96,8 @@ async def predict_single(
         data = input_data
 
     elif any(request_vars):
-        data = {
+        data = {}
+        vals = {
             "brewery_name": brewery_name,
             "review_aroma": review_aroma,
             "review_appearance": review_appearance,
@@ -104,6 +105,10 @@ async def predict_single(
             "review_taste": review_taste,
             "beer_abv": beer_abv,
         }
+        for key, value in vals.items():
+            if value is not None:
+                data[key]=value
+
         data = SingleInput.parse_obj(data)
 
     if data is None:
